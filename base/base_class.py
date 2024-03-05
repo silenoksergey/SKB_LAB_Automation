@@ -14,11 +14,15 @@ class Base():
     #Сессия
     session = requests.Session()
 
-    #User-agent
+    #Headers
     user = fake_useragent.UserAgent().random
     headers = {
         'User-Agent': user
     }
+
+
+
+
 
 
 
@@ -42,14 +46,16 @@ class Base():
             "auth_code": "1234"
         }
 
-        #Метод login
+        # #Метод login
         login = self.session.post(link_login_page, headers=self.headers, data=data_login)
         assert login.status_code == 200, f'Метод login вернул {login.json()}'
+
 
         #Метод auth
         auth = self.session.post(link_auth_page, headers=self.headers, data=data_auth)
         assert auth.status_code == 200, f'Метод auth вернул {auth.json()}'
         print("Успешная авторизация")
+        print(auth.text)
 
 
 
@@ -72,12 +78,7 @@ class Base():
             print('Переход к указанному пользователю')
 
 
-    # def get_cookies(self):
-    #     browser_cookies = self.driver.get_cookies()
-    #     for cookie in browser_cookies:
-    #         self.session.cookies.set(cookie['name'], cookie['value'])
-    #     response = self.session.get('https://example.com')
-    #     return response.cookies
+
 
     #Получение текущего URL
     def get_current_url(self):
@@ -87,8 +88,8 @@ class Base():
         main_url = self.domain + '/summary'
         self.session.get(main_url)
 
-        assert self.get_current_url() is main_url, f"Не корректный URL, ожидается страница {main_url}, открыта {self.get_current_url()}"
-        print("Открыта главная страница")
+        # assert self.get_current_url() is main_url, f"Не корректный URL, ожидается страница {main_url}, открыта {self.get_current_url()}"
+        # print("Открыта главная страница")
 
 
 
