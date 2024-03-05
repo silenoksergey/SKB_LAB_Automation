@@ -15,7 +15,7 @@ def test_buy_product():
 
     login = Base(driver)
     login.autorization(user_login="338397")
-    login.change_customer(customer_id=1618616861)
+    login.change_customer(customer_id=1618616861)  #ЮЛ - 1618616861   ФЛ - 1618616855
 
 
 
