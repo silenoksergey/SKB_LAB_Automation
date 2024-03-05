@@ -1,9 +1,9 @@
 import fake_useragent
-import requests, json
+import requests, json, pickle, time
+from pip._internal.network import session
 from selenium import webdriver
 
 class Base():
-
 
     def __init__(self, driver):
         self.driver = driver
@@ -14,13 +14,13 @@ class Base():
     #Сессия
     session = requests.Session()
 
-    #Headers
+    #Headers до авторизации
     user = fake_useragent.UserAgent().random
     headers = {
         'User-Agent': user
     }
-
-
+    #Куки после авторизации
+    auth_cookies = {}
 
 
 
@@ -55,7 +55,10 @@ class Base():
         auth = self.session.post(link_auth_page, headers=self.headers, data=data_auth)
         assert auth.status_code == 200, f'Метод auth вернул {auth.json()}'
         print("Успешная авторизация")
-        print(auth.text)
+
+        cookies = self.session.cookies.get_dict()
+        self.auth_cookies = cookies
+        print(self.auth_cookies)
 
 
 
@@ -85,8 +88,19 @@ class Base():
         return self.driver.current_url
 
     def go_to_main_page(self):
-        main_url = self.domain + '/summary'
-        self.session.get(main_url)
+
+        self.driver.get(self.domain + '/summary')
+        self.driver.add_cookie({'name': 'foo', 'value': 'bar'})
+        self.driver.delete_all_cookies()
+        self.driver.add_cookie(self.auth_cookies)
+        self.driver.refresh()
+
+
+        time.sleep(5)
+
+
+        # main_url = self.domain + '/summary'
+        # self.session.get(main_url)
 
         # assert self.get_current_url() is main_url, f"Не корректный URL, ожидается страница {main_url}, открыта {self.get_current_url()}"
         # print("Открыта главная страница")
