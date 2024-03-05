@@ -1,8 +1,10 @@
 import fake_useragent
 import requests, json
-
+from selenium import webdriver
 
 class Base():
+
+
     def __init__(self, driver):
         self.driver = driver
 
@@ -18,17 +20,6 @@ class Base():
         'User-Agent': user
     }
 
-    #Получение текущего URL
-    def get_current_url(self):
-        get_url = self.driver.current_url
-        print("Current URL is: " + get_url)
-
-
-    #Проверка текста
-    def assert_word(self, word, result):
-        value_word = word.text
-        assert value_word == result
-        print("Good value word")
 
 
     #Авторизация
@@ -61,6 +52,7 @@ class Base():
         print("Успешная авторизация")
 
 
+
     #Переходим к ЮЛ или ФЛ, в зависимости от переданного в метод customer_id клиента
     def change_customer(self, customer_id=int):
 
@@ -80,6 +72,30 @@ class Base():
             print('Переход к указанному пользователю')
 
 
+    # def get_cookies(self):
+    #     browser_cookies = self.driver.get_cookies()
+    #     for cookie in browser_cookies:
+    #         self.session.cookies.set(cookie['name'], cookie['value'])
+    #     response = self.session.get('https://example.com')
+    #     return response.cookies
 
+    #Получение текущего URL
+    def get_current_url(self):
+        return self.driver.current_url
+
+    def go_to_main_page(self):
+        main_url = self.domain + '/summary'
+        self.session.get(main_url)
+
+        assert self.get_current_url() is main_url, f"Не корректный URL, ожидается страница {main_url}, открыта {self.get_current_url()}"
+        print("Открыта главная страница")
+
+
+
+    #Проверка текста
+    def assert_word(self, word, result):
+        value_word = word.text
+        assert value_word == result
+        print("Good value word")
 
 
