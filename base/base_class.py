@@ -2,14 +2,26 @@ import fake_useragent
 import requests, json, pickle, time
 from pip._internal.network import session
 from selenium import webdriver
-
+from selenium.webdriver.chrome.options import Options
 class Base():
 
     def __init__(self, driver):
         self.driver = driver
-        options = webdriver.ChromeOptions()
-        options.add_argument(
-            'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 YaBrowser/24.1.0.0 Safari/537.36')
+        options = Options()
+        options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 YaBrowser/24.1.0.0 Safari/537.36')
+        options.add_argument('contant-type=application/json')
+        options.add_argument('accept=application/json, text/plain, */*')
+        options.add_argument('accept-encoding=gzip, deflate, br')
+        options.add_argument('connection=keep-alive')
+        options.add_argument('Accept-Language=ru,en;q=0.9')
+        options.add_argument('authority=delo-prod.skblab.ru')
+        options.add_argument('scheme=https')
+        options.add_argument('Referer=https://delo-prod.skblab')
+        options.add_argument('Sec-Ch-Ua-Platform=Windows')
+        options.add_argument('Sec-Fetch-Dest=empty')
+        options.add_argument('Sec-Fetch-Mode=cors')
+        options.add_argument('Sec-Fetch-Site=same-origin')
+
 
     #Стенд
     domain = "https://delo-prod.skblab.ru"
@@ -45,7 +57,6 @@ class Base():
         #Метод login
         login = self.session.post(link_login_page, headers=self.headers,  data=data_login)
         assert login.status_code == 200, f'Метод login вернул {login.json()}'
-
 
         #Метод auth
         auth = self.session.post(link_auth_page, headers=self.headers, data=data_auth)
@@ -86,6 +97,7 @@ class Base():
     def get_current_url(self):
         return self.driver.current_url
 
+
     #Переход на главную страницу
     def go_to_main_page(self):
 
@@ -96,6 +108,9 @@ class Base():
         for cookie in cookies:
             self.driver.add_cookie({"name": cookie.name, "value": cookie.value, "domain": cookie.domain,
                                     "path": cookie.path, "secure": cookie.secure, "expires": cookie.expires})
+
+
+
 
         self.driver.get(self.domain + "/summary")
 
