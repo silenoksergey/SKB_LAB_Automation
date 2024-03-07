@@ -7,6 +7,9 @@ class Base():
 
     def __init__(self, driver):
         self.driver = driver
+        options = webdriver.ChromeOptions()
+        options.add_argument(
+            'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 YaBrowser/24.1.0.0 Safari/537.36')
 
     #Стенд
     domain = "https://delo-prod.skblab.ru"
@@ -14,15 +17,8 @@ class Base():
     #Сессия
     session = requests.Session()
 
-    #Headers до авторизации
-    user = fake_useragent.UserAgent().random
-    headers = {
-        'User-Agent': user
-    }
-    #Куки после авторизации
-    auth_cookies = {}
-
-
+    # #User agent
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 YaBrowser/24.1.0.0 Safari/537.36'}
 
 
 
@@ -46,8 +42,8 @@ class Base():
             "auth_code": "1234"
         }
 
-        # #Метод login
-        login = self.session.post(link_login_page, headers=self.headers, data=data_login)
+        #Метод login
+        login = self.session.post(link_login_page, headers=self.headers,  data=data_login)
         assert login.status_code == 200, f'Метод login вернул {login.json()}'
 
 
@@ -56,9 +52,12 @@ class Base():
         assert auth.status_code == 200, f'Метод auth вернул {auth.json()}'
         print("Успешная авторизация")
 
-        cookies = self.session.cookies.get_dict()
-        self.auth_cookies = cookies
-        print(self.auth_cookies)
+
+
+
+
+
+
 
 
 
@@ -87,23 +86,29 @@ class Base():
     def get_current_url(self):
         return self.driver.current_url
 
+    #Переход на главную страницу
     def go_to_main_page(self):
 
-        self.driver.get(self.domain + '/summary')
-        self.driver.add_cookie({'name': 'foo', 'value': 'bar'})
+        self.driver.get(self.domain)
         self.driver.delete_all_cookies()
-        self.driver.add_cookie(self.auth_cookies)
-        self.driver.refresh()
+        cookies = self.session.cookies
+
+        for cookie in cookies:
+            self.driver.add_cookie({"name": cookie.name, "value": cookie.value, "domain": cookie.domain,
+                                    "path": cookie.path, "secure": cookie.secure, "expires": cookie.expires})
+
+        self.driver.get(self.domain + "/summary")
+
+        driver_cookies = self.driver.get_cookies()
+        print(driver_cookies)
+        time.sleep(10)
 
 
-        time.sleep(5)
 
-
-        # main_url = self.domain + '/summary'
-        # self.session.get(main_url)
 
         # assert self.get_current_url() is main_url, f"Не корректный URL, ожидается страница {main_url}, открыта {self.get_current_url()}"
         # print("Открыта главная страница")
+
 
 
 
